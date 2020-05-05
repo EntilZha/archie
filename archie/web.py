@@ -3,6 +3,7 @@ import requests
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from archie.database import (
     SessionLocal,
@@ -14,6 +15,7 @@ from archie.database import (
 
 
 app = FastAPI()
+app.mount("/", StaticFiles(directory="static"), name="static")
 
 GOOGLE_SEARCH = "https://www.google.com/search?q=%s&btnK"
 GOOGLE_SUGGEST = (
@@ -36,11 +38,6 @@ def handle_command(bookmark, terms):
     else:
         args = " ".join(terms)
         return RedirectResponse(url % args)
-
-
-@app.get("/")
-async def index():
-    pass
 
 
 @app.get("/list")
