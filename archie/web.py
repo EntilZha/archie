@@ -15,7 +15,6 @@ from archie.database import (
 
 
 app = FastAPI()
-app.mount("/", StaticFiles(directory="static"), name="static")
 
 GOOGLE_SEARCH = "https://www.google.com/search?q=%s&btnK"
 GOOGLE_SUGGEST = (
@@ -81,3 +80,6 @@ async def search(q: str, db: Session = Depends(get_db)):
 @app.get("/suggest")
 async def suggest(q: str):
     return requests.get(GOOGLE_SUGGEST % q).json()
+
+
+app.mount("/", StaticFiles(directory="static"), name="static")
