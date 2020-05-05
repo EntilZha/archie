@@ -17,9 +17,7 @@ from archie.database import (
 app = FastAPI()
 
 GOOGLE_SEARCH = "https://www.google.com/search?q=%s&btnK"
-GOOGLE_SUGGEST = (
-    "http://suggestqueries.google.com/complete/search?output=firefox&hl=en&q=%s"
-)
+GOOGLE_SUGGEST = "https://www.google.com/complete/search?client=opera&q=%s"
 
 
 def get_db():
