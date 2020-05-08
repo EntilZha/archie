@@ -1,6 +1,8 @@
 import requests
+import arrow
 
 from sqlalchemy.orm import Session
+
 from fastapi import FastAPI, Depends
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -37,6 +39,18 @@ def handle_command(bookmark, terms):
         return RedirectResponse(url % args)
 
 
+def tz_convert(datetime_str, src_tz, dst_tz):
+    parsed_dt = arrow.get(datetime_str, tzinfo=src_tz)
+    dt = parsed_dt.to(dst_tz)
+    return {
+        "input_datetime": datetime_str,
+        "parsed_datetime": str(parsed_dt),
+        "parsed_tz": str(parsed_dt.tzinfo),
+        "converted_datetime": str(dt),
+        "converted_tz": str(dt.tzinfo),
+    }
+
+
 @app.get("/list")
 async def list_api(db: Session = Depends(get_db)):
     return list_bookmarks(db)
@@ -63,6 +77,8 @@ async def search(q: str, db: Session = Depends(get_db)):
         new_command = tokens[1]
         remove_bookmark(db, new_command)
         return f"Removed: {new_command}"
+    elif command == "tz":
+        return tz_convert(tokens[1], tokens[2], tokens[3])
     elif command == "list":
         return list_bookmarks(db)
     elif command == "help":
