@@ -19,7 +19,8 @@ from archie.database import (
 app = FastAPI()
 
 GOOGLE_SEARCH = "https://www.google.com/search?q=%s&btnK"
-GOOGLE_SUGGEST = "https://www.google.com/complete/search?client=opera&q=%s"
+GOOGLE_SUGGEST_FF = "https://www.google.com/complete/search?client=firefox&q=%s"
+GOOGLE_SUGGEST_OPERA = "https://www.google.com/complete/search?client=opera&q=%s"
 
 
 def get_db():
@@ -91,9 +92,14 @@ async def search(q: str, db: Session = Depends(get_db)):
             return handle_command(bookmark, tokens[1:])
 
 
-@app.get("/suggest")
+@app.get("/suggest/firefox")
 async def suggest(q: str):
-    return requests.get(GOOGLE_SUGGEST % q).json()
+    return requests.get(GOOGLE_SUGGEST_FF % q).json()
+
+
+@app.get("/suggest/opera")
+async def suggest(q: str):
+    return requests.get(GOOGLE_SUGGEST_OPERA % q).json()
 
 
 app.mount("/", StaticFiles(directory="static"), name="static")
