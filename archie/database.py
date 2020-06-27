@@ -80,7 +80,7 @@ def get_recent_clip(db: Session):
 
 
 def list_clips(db: Session) -> List[Clip]:
-    return db.query(Clip).all()
+    return db.query(Clip).order_by(Clip.created_time.desc()).all()
 
 
 def get_bookmark(db: Session, command: str) -> Optional[Bookmark]:
