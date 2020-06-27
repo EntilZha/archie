@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 import datetime
 
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
