@@ -107,7 +107,7 @@ async def copy(content: str, db: Session = Depends(get_db)):
 
 @app.get("/clip/list")
 async def list_clip(db: Session = Depends(get_db)):
-    return [c.content for c in list_clips()]
+    return [c.content for c in list_clips(db)]
 
 
 @app.get("/suggest/firefox")
