@@ -13,6 +13,9 @@ from archie.database import (
     list_bookmarks,
     add_bookmark,
     remove_bookmark,
+    get_recent_clip,
+    add_clip,
+    list_clips,
 )
 
 
@@ -92,13 +95,28 @@ async def search(q: str, db: Session = Depends(get_db)):
             return handle_command(bookmark, tokens[1:])
 
 
+@app.get("/clip/paste")
+async def paste(db: Session = Depends(get_db)):
+    return get_recent_clip(db)
+
+
+@app.post("/clip/copy")
+async def copy(content: str, db: Session = Depends(get_db)):
+    add_clip(db, content)
+
+
+@app.get("/clip/list")
+async def list_clip(db: Session = Depends(get_db)):
+    return [c.content for c in list_clips()]
+
+
 @app.get("/suggest/firefox")
-async def suggest(q: str):
+async def ff_suggest(q: str):
     return requests.get(GOOGLE_SUGGEST_FF % q).json()
 
 
 @app.get("/suggest/opera")
-async def suggest(q: str):
+async def opera_suggest(q: str):
     return requests.get(GOOGLE_SUGGEST_OPERA % q).json()
 
 

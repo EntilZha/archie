@@ -1,6 +1,7 @@
 from typing import Optional, Dict
+import datetime
 
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
@@ -48,6 +49,13 @@ class Bookmark(Base):
     url = Column(String)
 
 
+class Clip(Base):
+    __tablename__ = "clips"
+    id = Column(Integer, primary_key=True)
+    created_time = Column(DateTime)
+    content = Column(String)
+
+
 def initialize_db():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
@@ -55,6 +63,24 @@ def initialize_db():
         bookmark = Bookmark(command=command, url=url)
         db.add(bookmark)
     db.commit()
+
+
+def add_clip(db: Session, content: str):
+    clip = Clip(created_time=datetime.datetime.now(), content=content)
+    db.add(clip)
+    db.commit()
+
+
+def get_recent_clip(db: Session):
+    maybe_clip = db.query(Clip).order_by(Clip.created_time.desc).first()
+    if maybe_clip is None:
+        return ""
+    else:
+        return maybe_clip.content
+
+
+def list_clips(db: Session) -> List[Clip]:
+    return db.query(Clip).all()
 
 
 def get_bookmark(db: Session, command: str) -> Optional[Bookmark]:
