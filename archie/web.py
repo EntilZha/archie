@@ -3,11 +3,9 @@ import arrow
 
 from sqlalchemy.orm import Session
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Body
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-
-from pydantic import BaseModel
 
 from archie.database import (
     SessionLocal,
@@ -26,10 +24,6 @@ app = FastAPI()
 GOOGLE_SEARCH = "https://www.google.com/search?q=%s&btnK"
 GOOGLE_SUGGEST_FF = "https://www.google.com/complete/search?client=firefox&q=%s"
 GOOGLE_SUGGEST_OPERA = "https://www.google.com/complete/search?client=opera&q=%s"
-
-
-class ClipBody(BaseModel):
-    content: str
 
 
 def get_db():
@@ -107,8 +101,8 @@ async def paste(db: Session = Depends(get_db)):
 
 
 @app.post("/clip/copy")
-async def copy(content: ClipBody, db: Session = Depends(get_db)):
-    add_clip(db, content.content)
+async def copy(content: str = Body(...), db: Session = Depends(get_db)):
+    add_clip(db, content)
 
 
 @app.get("/clip/list")
