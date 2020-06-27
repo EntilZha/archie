@@ -72,7 +72,7 @@ def add_clip(db: Session, content: str):
 
 
 def get_recent_clip(db: Session):
-    maybe_clip = db.query(Clip).order_by(Clip.created_time.desc).first()
+    maybe_clip = db.query(Clip).order_by(Clip.created_time.desc()).first()
     if maybe_clip is None:
         return ""
     else:
