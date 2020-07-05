@@ -1,5 +1,8 @@
 from typing import Optional, Dict, List
+import os
 import datetime
+
+import toml
 
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
@@ -13,33 +16,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-INITIAL_BOOKMARKS = {
-    "acl": "https://www.aclweb.org/anthology/search/?q=%s",
-    "am": "https://www.amazon.com/s?k=%s",
-    "apr": "https://www.archlinux.org/packages/?sort=&q=%s&maintainer=&flagged=",
-    "aur": "https://aur.archlinux.org/packages/?O=0&SeB=nd&K=%s&outdated=&SB=n&SO=a&PP=50&do_Search=Go",
-    "aws": "https://console.aws.amazon.com/",
-    "benepar": "https://github.com/nikitakit/self-attentive-parser",
-    "def": "https://www.lexico.com/en/definition/%s",
-    "g": "https://www.google.com/search?q=%s&btnK",
-    "gh": "https://github.com/search?q=%s&ref=opensearch",
-    "gim": "https://www.google.com/search?q=%s&um=1&ie=UTF-8&hl=en&tbm=isch",
-    "gm": "http://maps.google.com/maps?q=%s",
-    "hub": "https://github.com",
-    "iclr": "https://openreview.net/search?term=test&content=all&group=all&source=all",
-    "imdb": "http://www.imdb.com/find?q=%s",
-    "majora": "https://materiacollective.store/collections/times-end-majoras-mask-remixed",
-    "p9": "https://plotnine.readthedocs.io/en/stable/search.html?q=%s&check_keywords=yes&area=default",
-    "py": "https://docs.python.org/3/search.html?q=%s",
-    "r": "https://www.reddit.com/r/%s",
-    "rmtg": "https://www.reddit.com/r/magicTCG/",
-    "rterra": "https://www.reddit.com/r/LegendsOfRuneterra/",
-    "sc": "https://www.semanticscholar.org/search?q=%s&sort=relevance",
-    "scry": "https://scryfall.com/search?q=%s",
-    "wiki": "http://en.wikipedia.org/?search=%s",
-    "ynews": "https://news.ycombinator.com/",
-    "yt": "http://www.youtube.com/results?search_type=search_videos&search_sort=relevance&search_query=%s&search=Search",
-}
+if os.path.exists("config.toml"):
+    with open("config.toml") as f:
+        config = toml.load(f)
+else:
+    with open("default.toml") as f:
+        config = toml.load(f)
 
 
 class Bookmark(Base):
@@ -59,7 +41,7 @@ class Clip(Base):
 def initialize_db():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
-    for command, url in INITIAL_BOOKMARKS.items():
+    for command, url in config["initial_bookmarks"].items():
         bookmark = Bookmark(command=command, url=url)
         db.add(bookmark)
     db.commit()
