@@ -1,25 +1,24 @@
-import requests
+import os
+import subprocess
+
 import arrow
-
-from sqlalchemy.orm import Session
-
-from fastapi import FastAPI, Depends
+import requests
+from fastapi import Depends, FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from archie.database import (
     SessionLocal,
-    get_bookmark,
-    list_bookmarks,
     add_bookmark,
-    remove_bookmark,
-    get_recent_clip,
     add_clip,
+    get_bookmark,
+    get_recent_clip,
+    list_bookmarks,
     list_clips,
+    remove_bookmark,
 )
-
 
 app = FastAPI()
 
@@ -124,6 +123,21 @@ async def ff_suggest(q: str):
 @app.get("/suggest/opera")
 async def opera_suggest(q: str):
     return requests.get(GOOGLE_SUGGEST_OPERA % q).json()
+
+
+@app.get("/yt-dl/list")
+async def ytdl_list():
+    return os.listdir("/fs/media/music")
+
+
+@app.get("/yt-dl/download")
+async def ytdl_download(url: str, folder: str):
+    os.makedirs(f"/fs/media/music/{folder}/", exist_ok=True)
+    subprocess.run(
+        f"youtube-dl -x --audio-quality 0 --audio-format flac -w -o '/fs/media/music/{folder}/%(title)s-%(id)s.%(ext)s' '{url}'",
+        shell=True,
+    )
+    return True
 
 
 app.mount("/", StaticFiles(directory="static"), name="static")

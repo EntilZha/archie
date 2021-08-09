@@ -19,8 +19,6 @@ def main():
     token = os.environ.get("DISCORD_BD1_TOKEN")
     if token is None:
         raise ValueError("DISCORD_BD1_TOKEN not set")
-    user = bot.get_user(ENTILZHA_ID)
-    user.send("Hello there")
     bot.run(token)
 
 
